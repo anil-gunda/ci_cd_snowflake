@@ -1,1 +1,2 @@
+--liquibase formatted sql
 CREATE TABLE DEV.CONFIG.SAMPLE_TABLE_1 (ID NUMBER);
