@@ -1,8 +1,6 @@
 name: CI/CD Pipeline
 
 on:
-  pull_request:
-    branches: [dev, qa, main]
   push:
     branches: [dev, qa, main]
 
@@ -26,9 +24,9 @@ jobs:
     
     - name: Install Liquibase
       run: |
-        wget https://github.com/liquibase/liquibase/releases/download/v4.18.0/liquibase-4.18.0-bin.tar.gz
-        tar -xzf liquibase-4.18.0-bin.tar.gz
-        echo "/home/runner/work/your-repo-name/your-repo-name/liquibase-4.18.0" >> $GITHUB_PATH
+        wget https://github.com/liquibase/liquibase/releases/download/v4.28.0/liquibase-4.28.0.tar.gz
+        mkdir liquibase && tar -xzf liquibase-4.28.0.tar.gz -C liquibase
+        echo "${{ github.workspace }}/liquibase" >> $GITHUB_PATH
 
     - name: Identify new changelog file
       run: |
@@ -53,8 +51,8 @@ jobs:
       run: |
         liquibase \
           --driver=com.snowflake.client.jdbc.SnowflakeDriver \
-          --classpath=/home/runner/work/your-repo-name/your-repo-name/liquibase-4.18.0/lib/snowflake-jdbc.jar \
-          --url="jdbc:snowflake://$SNOWFLAKE_ACCOUNT.snowflakecomputing.com" \
+          --classpath=${{ github.workspace }}/liquibase/internal/lib/snowflake-jdbc.jar \
+          --url="jdbc:snowflake://$SNOWFLAKE_ACCOUNT.snowflakecomputing.com/?db=PROD&role=ACCOUNTADMIN&warehouse=COMPUTE_WH" \
           --username=$SNOWFLAKE_USER \
           --password=$SNOWFLAKE_PASSWORD \
           --logLevel=info \
