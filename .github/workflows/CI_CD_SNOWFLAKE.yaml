@@ -1,0 +1,62 @@
+name: CI/CD Pipeline
+
+on:
+  pull_request:
+    branches: [dev, qa, main]
+  push:
+    branches: [dev, qa, main]
+
+env:
+  SNOWFLAKE_ACCOUNT: ${{ secrets.SNOWFLAKE_ACCOUNT }}
+  SNOWFLAKE_USER: ${{ secrets.SNOWFLAKE_USER }}
+  SNOWFLAKE_PASSWORD: ${{ secrets.SNOWFLAKE_PASSWORD }}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0  # Fetch all history for all branches and tags
+    
+    - name: Setup Java
+      uses: actions/setup-java@v3
+      with:
+        java-version: '11'
+    
+    - name: Install Liquibase
+      run: |
+        wget https://github.com/liquibase/liquibase/releases/download/v4.18.0/liquibase-4.18.0-bin.tar.gz
+        tar -xzf liquibase-4.18.0-bin.tar.gz
+        echo "/home/runner/work/your-repo-name/your-repo-name/liquibase-4.18.0" >> $GITHUB_PATH
+
+    - name: Identify new changelog file
+      run: |
+        if [ "${{ github.event_name }}" = "pull_request" ]; then
+          base_sha=${{ github.event.pull_request.base.sha }}
+        else
+          base_sha=$(git rev-parse HEAD^)
+        fi
+        
+        new_changelog=$(git diff --name-only $base_sha HEAD -- edw/changelogs/ | grep '2024_.*_chg_log\.xml$')
+        
+        if [ $(echo "$new_changelog" | wc -l) -ne 1 ]; then
+          echo "Error: Expected exactly one new changelog file, found $(echo "$new_changelog" | wc -l)"
+          exit 1
+        fi
+        
+        echo "NEW_CHANGELOG=$new_changelog" >> $GITHUB_ENV
+
+    - name: Deploy to Snowflake
+      env:
+        SNOWFLAKE_DATABASE: ${{ (github.ref == 'refs/heads/dev' || github.base_ref == 'dev') && 'DEV' || (github.ref == 'refs/heads/qa' || github.base_ref == 'qa') && 'QA' || (github.ref == 'refs/heads/main' || github.base_ref == 'main') && 'PROD' }}
+      run: |
+        liquibase \
+          --driver=com.snowflake.client.jdbc.SnowflakeDriver \
+          --classpath=/home/runner/work/your-repo-name/your-repo-name/liquibase-4.18.0/lib/snowflake-jdbc.jar \
+          --url="jdbc:snowflake://$SNOWFLAKE_ACCOUNT.snowflakecomputing.com" \
+          --username=$SNOWFLAKE_USER \
+          --password=$SNOWFLAKE_PASSWORD \
+          --logLevel=info \
+          --changeLogFile=$NEW_CHANGELOG \
+          update
