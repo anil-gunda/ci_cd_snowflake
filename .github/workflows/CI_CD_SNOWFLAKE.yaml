@@ -41,7 +41,7 @@ jobs:
         echo "Base SHA: $base_sha"
         echo "Current SHA: ${{ github.sha }}"
         
-        new_changelog=$(git diff --name-only $base_sha HEAD -- edw/changelogs/ | grep '2024_.*_chg_log\.xml$')
+        new_changelog=$(git diff --name-only $base_sha HEAD | grep '2024_.*_chg_log\.xml$')
 
         echo "Detected changelog files:"
         echo "$new_changelog"
