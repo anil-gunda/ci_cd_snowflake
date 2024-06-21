@@ -70,7 +70,7 @@ jobs:
         liquibase \
           --driver=com.snowflake.client.jdbc.SnowflakeDriver \
           --classpath=${{ github.workspace }}/liquibase/internal/lib/snowflake-jdbc.jar \
-          --url="jdbc:snowflake://$SNOWFLAKE_ACCOUNT.snowflakecomputing.com/?db=PROD&role=ACCOUNTADMIN&warehouse=COMPUTE_WH" \
+          --url="jdbc:snowflake://$SNOWFLAKE_ACCOUNT.snowflakecomputing.com/?db=PROD&schema=CONFIG&role=ACCOUNTADMIN&warehouse=COMPUTE_WH" \
           --username=$SNOWFLAKE_USER \
           --password=$SNOWFLAKE_PASSWORD \
           --logLevel=info \
