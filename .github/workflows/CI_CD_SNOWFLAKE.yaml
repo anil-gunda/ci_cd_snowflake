@@ -62,7 +62,7 @@ jobs:
     - name: Inspect Curr PWD
       run: |
           pwd
-          echo "PWD"=$pwd" >> $GITHUB_ENV
+          echo "PWD=$pwd" >> $GITHUB_ENV
     - name: Deploy to Snowflake
       env:
         SNOWFLAKE_DATABASE: ${{ (github.ref == 'refs/heads/dev' || github.base_ref == 'dev') && 'DEV' || (github.ref == 'refs/heads/qa' || github.base_ref == 'qa') && 'QA' || (github.ref == 'refs/heads/main' || github.base_ref == 'main') && 'PROD' }}
