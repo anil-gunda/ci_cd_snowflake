@@ -59,6 +59,10 @@ jobs:
         
         echo "NEW_CHANGELOG=$new_changelog" >> $GITHUB_ENV
 
+    - name: Inspect Curr PWD
+      run: |
+          pwd
+          ls
     - name: Deploy to Snowflake
       env:
         SNOWFLAKE_DATABASE: ${{ (github.ref == 'refs/heads/dev' || github.base_ref == 'dev') && 'DEV' || (github.ref == 'refs/heads/qa' || github.base_ref == 'qa') && 'QA' || (github.ref == 'refs/heads/main' || github.base_ref == 'main') && 'PROD' }}
