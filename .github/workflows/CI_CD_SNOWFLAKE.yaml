@@ -71,4 +71,5 @@ jobs:
           --password=$SNOWFLAKE_PASSWORD \
           --logLevel=info \
           --changeLogFile=$NEW_CHANGELOG \
+          --searchPath=${{ github.workspace }} \
           update
