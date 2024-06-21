@@ -9,4 +9,5 @@
         http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd
         http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-latest.xsd">
     <include file="/DEV/CONFIG/TABLES/SAMPLE_TABLE_2.sql"/>
+    <include file="/DEV/CONFIG/TABLES/SAMPLE_TABLE_1.sql"/>
 </databaseChangeLog>
